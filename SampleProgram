@@ -3,7 +3,7 @@
 
 main()
 const float bi=3.14;
-var int num,count,
+var int num,count;
 var float x;
 { input>>num;
    if (num !=0)

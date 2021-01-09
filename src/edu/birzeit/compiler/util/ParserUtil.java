@@ -18,7 +18,8 @@ public class ParserUtil {
             "%", "<<", ">>",
             "=", "output", "if",
             "endif", "else", "while",
-            "#","<",">"));
+            "#","<",">",
+            ",","{","}"));
 
     public static boolean isReserved(String s) {
         return reservedKeyWords.contains(s)||characterSet.contains(s);
