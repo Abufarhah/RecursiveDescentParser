@@ -211,6 +211,7 @@ public class Main {
                 return;
             }
             statement();
+            getToken();
             if (token.equals("}")) {
                 return;
             }
@@ -245,7 +246,6 @@ public class Main {
             throw new RuntimeException("assign statement error, missing =");
         }
         exp();
-        getToken();
     }
 
     private static void inOutStmt() {
@@ -270,7 +270,6 @@ public class Main {
                 throw new RuntimeException("output statement error, missing <<");
             }
         }
-        getToken();
     }
 
     private static void ifStmt() {
@@ -289,7 +288,6 @@ public class Main {
         if (!token.equals("endif")) {
             throw new RuntimeException("if statement error, missing endif");
         }
-        getToken();
     }
 
     private static void whileStmt() {
@@ -310,7 +308,6 @@ public class Main {
         if(!token.equals("}")){
             throw new RuntimeException("while statement error, missing }");
         }
-        getToken();
     }
 
     private static void nameValue() {
