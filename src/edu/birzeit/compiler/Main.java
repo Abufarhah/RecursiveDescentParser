@@ -21,7 +21,7 @@ public class Main {
             program();
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
-            System.out.println("at line: " + (lineIndex - 1));
+            System.out.println("at line: " + lineIndex);
         }
     }
 
