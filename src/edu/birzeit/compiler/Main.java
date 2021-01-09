@@ -21,7 +21,7 @@ public class Main {
             program();
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
-            System.out.println("at line: " + lineIndex);
+            System.out.println("at line: " + (lineIndex-1));
         }
     }
 
@@ -36,7 +36,7 @@ public class Main {
 
     private static void readLine() {
         if (scanner.hasNext()) {
-            line = scanner.nextLine();
+            line = scanner.nextLine().trim();
             ++lineIndex;
             tokenIndex = 0;
         }
@@ -46,7 +46,7 @@ public class Main {
         StringBuilder temp = new StringBuilder();
         if (tokenIndex < line.length()) {
             temp.append(getNext());
-            while (tokenIndex == 0 || (!ParserUtil.isReserved(next + "") && !ParserUtil.isReserved(temp.toString()) && !ParserUtil.isReserved(next() + "") && tokenIndex < line.length())) {
+            while (tokenIndex == 0 || (!ParserUtil.isReserved(next + "") && tokenIndex < line.length() && !ParserUtil.isReserved(temp.toString()) && !ParserUtil.isReserved(next() + ""))) {
                 temp.append(getNext());
             }
             token = temp.toString();
@@ -65,12 +65,16 @@ public class Main {
     }
 
     private static char next() {
-        int index = tokenIndex;
-        char n = line.charAt(index++);
-        while (n == ' ') {
-            n = line.charAt(index++);
+        if(tokenIndex < line.length()) {
+            int index = tokenIndex;
+            char n = line.charAt(index++);
+            while (n == ' ') {
+                n = line.charAt(index++);
+            }
+            return n;
+        }else{
+            return ' ';
         }
-        return n;
     }
 
     private static void program() {
@@ -85,11 +89,11 @@ public class Main {
 
     private static void body() {
         libDecl();
-        String t=token;
+        String t = token;
         getToken();
-        t+=token;
+        t += token;
         getToken();
-        t+=token;
+        t += token;
         if (t.equals("main()")) {
             declarations();
             block();
@@ -192,23 +196,28 @@ public class Main {
 
     private static void block() {
         if (!token.equals("{")) {
-            System.out.println("block error, missing {");
+            throw new RuntimeException("block error, missing {");
         }
         stmtList();
         if (!token.equals("}")) {
-            System.out.println("block error, missing }");
+            throw new RuntimeException("block error, missing }");
         }
     }
 
     private static void stmtList() {
-        statement();
-        while (token.equals(";")) {
+        while (!token.equals("}")) {
+            getToken();
+            if(token.equals("}")){
+                return;
+            }
             statement();
+            if (!token.equals(";")) {
+                throw new RuntimeException("block error, missing ;");
+            }
         }
     }
 
     private static void statement() {
-        getToken();
         if (token.equals("input") || token.equals("output")) {
             inOutStmt();
         } else if (token.equals("if")) {
@@ -225,7 +234,14 @@ public class Main {
     }
 
     private static void assStmt() {
-
+        if (ParserUtil.isReserved(token)) {
+            throw new RuntimeException("user defined name error, reserved keyword");
+        }
+        getToken();
+        if (!token.equals("=")) {
+            throw new RuntimeException("assign statement error, missing =");
+        }
+        exp();
     }
 
     private static void inOutStmt() {
@@ -236,6 +252,8 @@ public class Main {
             t += token;
             if (t.equals(">>")) {
                 name();
+            }else{
+                throw new RuntimeException("input statement error, missing >>");
             }
         } else {
             getToken();
@@ -244,6 +262,8 @@ public class Main {
             t += token;
             if (t.equals("<<")) {
                 nameValue();
+            }else{
+                throw new RuntimeException("output statement error, missing <<");
             }
         }
         getToken();
@@ -259,9 +279,11 @@ public class Main {
         if (!token.equals(")")) {
             throw new RuntimeException("if statement error, missing )");
         }
+        getToken();
         statement();
         elsePart();
-        if (!token.equals("endif")){
+        getToken();
+        if (!token.equals("endif")) {
             throw new RuntimeException("if statement error, missing endif");
         }
         getToken();
@@ -297,12 +319,60 @@ public class Main {
         }
     }
 
-    private static void elsePart(){
-        if(!token.equals("endif")) {
+    private static void elsePart() {
+        getToken();
+        if (!token.equals("endif")) {
             if (!token.equals("else")) {
                 throw new RuntimeException("else part error, missing else");
             }
+            getToken();
             statement();
+        }
+    }
+
+    private static void exp() {
+        term();
+        while ((next() + "").equals("+") || (next() + "").equals("-")) {
+            addOper();
+            term();
+        }
+    }
+
+    private static void term() {
+        factor();
+        while (!(next() + "").equals("+") && !(next() + "").equals("-")&& !(next() + "").equals(" ")) {
+            mulOper();
+            factor();
+        }
+    }
+
+    private static void factor() {
+        if ((next() + "").equals("(")) {
+            getToken();
+            if (!token.equals("(")) {
+                throw new RuntimeException("factor error, missing (");
+            }
+            exp();
+            getToken();
+            if (!token.equals(")")) {
+                throw new RuntimeException("factor error, missing )");
+            }
+        } else {
+            nameValue();
+        }
+    }
+
+    private static void mulOper() {
+        getToken();
+        if (!token.equals("*") && !token.equals("/") && !token.equals("%")) {
+            throw new RuntimeException("multiplication operation error");
+        }
+    }
+
+    private static void addOper() {
+        getToken();
+        if (!token.equals("+") && !token.equals("-")) {
+            throw new RuntimeException("addition operation error");
         }
     }
 }
