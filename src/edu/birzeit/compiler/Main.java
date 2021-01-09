@@ -21,7 +21,7 @@ public class Main {
             program();
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
-            System.out.println("at line: " + (lineIndex-1));
+            System.out.println("at line: " + (lineIndex - 1));
         }
     }
 
@@ -65,14 +65,14 @@ public class Main {
     }
 
     private static char next() {
-        if(tokenIndex < line.length()) {
+        if (tokenIndex < line.length()) {
             int index = tokenIndex;
             char n = line.charAt(index++);
             while (n == ' ') {
                 n = line.charAt(index++);
             }
             return n;
-        }else{
+        } else {
             return ' ';
         }
     }
@@ -207,12 +207,15 @@ public class Main {
     private static void stmtList() {
         while (!token.equals("}")) {
             getToken();
-            if(token.equals("}")){
+            if (token.equals("}")) {
                 return;
             }
             statement();
+            if (token.equals("}")) {
+                return;
+            }
             if (!token.equals(";")) {
-                throw new RuntimeException("block error, missing ;");
+                throw new RuntimeException("statement list error, missing ;");
             }
         }
     }
@@ -242,6 +245,7 @@ public class Main {
             throw new RuntimeException("assign statement error, missing =");
         }
         exp();
+        getToken();
     }
 
     private static void inOutStmt() {
@@ -252,7 +256,7 @@ public class Main {
             t += token;
             if (t.equals(">>")) {
                 name();
-            }else{
+            } else {
                 throw new RuntimeException("input statement error, missing >>");
             }
         } else {
@@ -262,7 +266,7 @@ public class Main {
             t += token;
             if (t.equals("<<")) {
                 nameValue();
-            }else{
+            } else {
                 throw new RuntimeException("output statement error, missing <<");
             }
         }
@@ -282,7 +286,6 @@ public class Main {
         getToken();
         statement();
         elsePart();
-        getToken();
         if (!token.equals("endif")) {
             throw new RuntimeException("if statement error, missing endif");
         }
@@ -290,7 +293,24 @@ public class Main {
     }
 
     private static void whileStmt() {
-
+        getToken();
+        if (!token.equals("(")) {
+            throw new RuntimeException("while statement error, missing (");
+        }
+        boolExp();
+        getToken();
+        if (!token.equals(")")) {
+            throw new RuntimeException("while statement error, missing )");
+        }
+        getToken();
+        if(!token.equals("{")){
+            throw new RuntimeException("while statement error, missing {");
+        }
+        stmtList();
+        if(!token.equals("}")){
+            throw new RuntimeException("while statement error, missing }");
+        }
+        getToken();
     }
 
     private static void nameValue() {
@@ -321,12 +341,10 @@ public class Main {
 
     private static void elsePart() {
         getToken();
-        if (!token.equals("endif")) {
-            if (!token.equals("else")) {
-                throw new RuntimeException("else part error, missing else");
-            }
+        if (token.equals("else")) {
             getToken();
             statement();
+            getToken();
         }
     }
 
@@ -340,7 +358,7 @@ public class Main {
 
     private static void term() {
         factor();
-        while (!(next() + "").equals("+") && !(next() + "").equals("-")&& !(next() + "").equals(" ")) {
+        while (!(next() + "").equals("+") && !(next() + "").equals("-")&& !(next() + "").equals(";") && !(next() + "").equals(" ")) {
             mulOper();
             factor();
         }
