@@ -21,7 +21,7 @@ public class Main {
             program();
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
-            System.out.println("at line: "+lineIndex);
+            System.out.println("at line: " + lineIndex);
         }
     }
 
@@ -46,7 +46,7 @@ public class Main {
         StringBuilder temp = new StringBuilder();
         if (tokenIndex < line.length()) {
             temp.append(getNext());
-            while (tokenIndex == 0 || (!ParserUtil.isReserved(next + "") && !ParserUtil.isReserved(temp.toString()) && !ParserUtil.isReserved(next() + "")&&tokenIndex < line.length())) {
+            while (tokenIndex == 0 || (!ParserUtil.isReserved(next + "") && !ParserUtil.isReserved(temp.toString()) && !ParserUtil.isReserved(next() + "") && tokenIndex < line.length())) {
                 temp.append(getNext());
             }
             token = temp.toString();
@@ -85,7 +85,12 @@ public class Main {
 
     private static void body() {
         libDecl();
-        if (token.equals("main()")) {
+        String t=token;
+        getToken();
+        t+=token;
+        getToken();
+        t+=token;
+        if (t.equals("main()")) {
             declarations();
             block();
         } else {
@@ -133,80 +138,171 @@ public class Main {
     }
 
     private static void constDecl() {
-        while (token.equals("const")){
+        while (token.equals("const")) {
             dataType();
             name();
             getToken();
-            if(!token.equals("=")){
+            if (!token.equals("=")) {
                 throw new RuntimeException("constant declaration error, missing =");
             }
             value();
             getToken();
-            if(!token.equals(";")){
+            if (!token.equals(";")) {
                 throw new RuntimeException("constant declaration error, missing ;");
             }
             getToken();
         }
     }
 
-    private static void varDecl(){
-        while (token.equals("var")){
+    private static void varDecl() {
+        while (token.equals("var")) {
             dataType();
             nameList();
-            if(!token.equals(";")){
+            if (!token.equals(";")) {
                 throw new RuntimeException("variable declaration error, missing ;");
             }
             getToken();
         }
     }
 
-    private static void dataType(){
+    private static void dataType() {
         getToken();
-        if(!token.equals("int")&&!token.equals("float")){
-            throw new RuntimeException("data type error, "+token+" not a data type");
+        if (!token.equals("int") && !token.equals("float")) {
+            throw new RuntimeException("data type error, " + token + " not a data type");
         }
     }
 
-    private static void value(){
+    private static void value() {
         getToken();
         try {
             Double.parseDouble(token);
-        }catch (NumberFormatException e){
-            throw new RuntimeException("value error, "+token+" not a number");
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("value error, " + token + " not a number");
         }
     }
 
-    private static void nameList(){
+    private static void nameList() {
         name();
         getToken();
-        while (token.equals(",")){
+        while (token.equals(",")) {
             name();
             getToken();
         }
     }
 
-    private static void block(){
-        if(!token.equals("{")){
+    private static void block() {
+        if (!token.equals("{")) {
             System.out.println("block error, missing {");
         }
         stmtList();
-        if(!token.equals("}")){
+        if (!token.equals("}")) {
             System.out.println("block error, missing }");
         }
     }
 
-    private static void stmtList(){
+    private static void stmtList() {
         statement();
-        getToken();
-        while (token.equals(";")){
+        while (token.equals(";")) {
             statement();
-            getToken();
         }
     }
 
-    private static void statement(){
+    private static void statement() {
         getToken();
-        
+        if (token.equals("input") || token.equals("output")) {
+            inOutStmt();
+        } else if (token.equals("if")) {
+            ifStmt();
+        } else if (token.equals("while")) {
+            whileStmt();
+        } else if (token.equals("{")) {
+            block();
+        } else if (!ParserUtil.isReserved(token)) {
+            assStmt();
+        } else if (!token.equals("}") && !token.equals(";")) {
+            throw new RuntimeException("statement error");
+        }
     }
 
+    private static void assStmt() {
+
+    }
+
+    private static void inOutStmt() {
+        if (token.equals("input")) {
+            getToken();
+            String t = token;
+            getToken();
+            t += token;
+            if (t.equals(">>")) {
+                name();
+            }
+        } else {
+            getToken();
+            String t = token;
+            getToken();
+            t += token;
+            if (t.equals("<<")) {
+                nameValue();
+            }
+        }
+        getToken();
+    }
+
+    private static void ifStmt() {
+        getToken();
+        if (!token.equals("(")) {
+            throw new RuntimeException("if statement error, missing (");
+        }
+        boolExp();
+        getToken();
+        if (!token.equals(")")) {
+            throw new RuntimeException("if statement error, missing )");
+        }
+        statement();
+        elsePart();
+        if (!token.equals("endif")){
+            throw new RuntimeException("if statement error, missing endif");
+        }
+        getToken();
+    }
+
+    private static void whileStmt() {
+
+    }
+
+    private static void nameValue() {
+        if (Character.isDigit(next())) {
+            value();
+        } else {
+            name();
+        }
+    }
+
+    private static void boolExp() {
+        nameValue();
+        relationalOpr();
+        nameValue();
+    }
+
+    private static void relationalOpr() {
+        getToken();
+        String t = token;
+        if (token.equals("=") || ((token.equals("<") || token.equals(">") || token.equals("!")) && (next() + "").equals("="))) {
+            getToken();
+            t += next;
+        }
+        if (!(t.equals("==") || t.equals("!=") || t.equals("<") || t.equals("<=") || t.equals(">") || t.equals(">="))) {
+            throw new RuntimeException("relational operation error");
+        }
+    }
+
+    private static void elsePart(){
+        if(!token.equals("endif")) {
+            if (!token.equals("else")) {
+                throw new RuntimeException("else part error, missing else");
+            }
+            statement();
+        }
+    }
 }
