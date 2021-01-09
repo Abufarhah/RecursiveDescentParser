@@ -301,11 +301,11 @@ public class Main {
             throw new RuntimeException("while statement error, missing )");
         }
         getToken();
-        if(!token.equals("{")){
+        if (!token.equals("{")) {
             throw new RuntimeException("while statement error, missing {");
         }
         stmtList();
-        if(!token.equals("}")){
+        if (!token.equals("}")) {
             throw new RuntimeException("while statement error, missing }");
         }
     }
@@ -355,7 +355,7 @@ public class Main {
 
     private static void term() {
         factor();
-        while (!(next() + "").equals("+") && !(next() + "").equals("-")&& !(next() + "").equals(";") && !(next() + "").equals(" ")) {
+        while (!(next() + "").equals("+") && !(next() + "").equals("-") && !(next() + "").equals(";") && !(next() + "").equals(" ")) {
             mulOper();
             factor();
         }
