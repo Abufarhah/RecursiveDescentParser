@@ -39,6 +39,8 @@ public class Main {
             line = scanner.nextLine().trim();
             ++lineIndex;
             tokenIndex = 0;
+        }else{
+            throw new RuntimeException("early eof, missing $");
         }
     }
 
