@@ -39,7 +39,7 @@ public class Main {
             line = scanner.nextLine().trim();
             ++lineIndex;
             tokenIndex = 0;
-        }else{
+        } else {
             throw new RuntimeException("early eof, missing $");
         }
     }
@@ -207,33 +207,30 @@ public class Main {
     }
 
     private static void stmtList() {
-        while (!token.equals("}")) {
+        getToken();
+        statement();
+        while (token.equals(";")) {
             getToken();
-            if (token.equals("}")) {
-                return;
-            }
             statement();
-            getToken();
-            if (token.equals("}")) {
-                return;
-            }
-            if (!token.equals(";")) {
-                throw new RuntimeException("statement list error, missing ;");
-            }
         }
     }
 
     private static void statement() {
         if (token.equals("input") || token.equals("output")) {
             inOutStmt();
+            getToken();
         } else if (token.equals("if")) {
             ifStmt();
+            getToken();
         } else if (token.equals("while")) {
             whileStmt();
+            getToken();
         } else if (token.equals("{")) {
             block();
+            getToken();
         } else if (!ParserUtil.isReserved(token)) {
             assStmt();
+            getToken();
         } else if (!token.equals("}") && !token.equals(";")) {
             throw new RuntimeException("statement error");
         }
@@ -339,11 +336,9 @@ public class Main {
     }
 
     private static void elsePart() {
-        getToken();
         if (token.equals("else")) {
             getToken();
             statement();
-            getToken();
         }
     }
 
