@@ -15,8 +15,13 @@ public class Main {
     private static int lineIndex = 0;
 
     public static void main(String[] args) {
-        initFile();
-        readLine();
+        try {
+            initFile();
+            readLine();
+        } catch (Exception e) {
+            System.out.println("File error");
+            return;
+        }
         try {
             program();
         } catch (RuntimeException e) {
@@ -92,10 +97,14 @@ public class Main {
     private static void body() {
         libDecl();
         String t = token;
-        getToken();
-        t += token;
-        getToken();
-        t += token;
+        try {
+            getToken();
+            t += token;
+            getToken();
+            t += token;
+        } catch (Exception e) {
+            throw new RuntimeException("main function error, missing main");
+        }
         if (t.equals("main()")) {
             declarations();
             block();
