@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * this util class used in Main class to check against reserved key-words and character set
+ */
 public class ParserUtil {
     private static Set<String> reservedKeyWords = new HashSet(Arrays.asList(
             "main()", "include", "const",
@@ -18,12 +21,12 @@ public class ParserUtil {
             "%", "<<", ">>",
             "=", "output", "if",
             "endif", "else", "while",
-            "#","<",">",
-            ",","{","}",
-            "<=",">=","!=",
-            "!","(",")"));
+            "#", "<", ">",
+            ",", "{", "}",
+            "<=", ">=", "!=",
+            "!", "(", ")"));
 
     public static boolean isReserved(String s) {
-        return reservedKeyWords.contains(s)||characterSet.contains(s);
+        return reservedKeyWords.contains(s) || characterSet.contains(s);
     }
 }

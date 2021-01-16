@@ -14,6 +14,12 @@ public class Main {
     private static int tokenIndex = 0;
     private static int lineIndex = 0;
 
+    /**
+     * main method
+     * initialize the file and read the first line the call program method
+     *
+     * @param args args
+     */
     public static void main(String[] args) {
         try {
             initFile();
@@ -30,6 +36,9 @@ public class Main {
         }
     }
 
+    /**
+     * this method used to initialize the file
+     */
     private static void initFile() {
         try {
             File file = new File("SampleProgram");
@@ -39,6 +48,9 @@ public class Main {
         }
     }
 
+    /**
+     * this method used to read line by line
+     */
     private static void readLine() {
         if (scanner.hasNext()) {
             line = scanner.nextLine().trim();
@@ -49,6 +61,9 @@ public class Main {
         }
     }
 
+    /**
+     * a generic method used to get token
+     */
     private static void getToken() {
         StringBuilder temp = new StringBuilder();
         if (tokenIndex < line.length()) {
@@ -63,6 +78,11 @@ public class Main {
         }
     }
 
+    /**
+     * this method used to read the next character
+     *
+     * @return char the next character in the file
+     */
     private static char getNext() {
         next = line.charAt(tokenIndex++);
         while (next == ' ') {
@@ -71,6 +91,11 @@ public class Main {
         return next;
     }
 
+    /**
+     * this method used to read the next character without increment the index
+     *
+     * @return char
+     */
     private static char next() {
         if (tokenIndex < line.length()) {
             int index = tokenIndex;
@@ -84,6 +109,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * program     body   $
+     */
     private static void program() {
         body();
         getToken();
@@ -94,6 +123,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * body    lib-decl       main ()       declarations      block
+     */
     private static void body() {
         libDecl();
         String t = token;
@@ -114,6 +147,10 @@ public class Main {
 
     }
 
+    /**
+     * non-terminal
+     * lib-decl    (  # include < name >   ;   )*
+     */
     private static void libDecl() {
         getToken();
         while (token.equals("#")) {
@@ -138,6 +175,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * name       “user-defined-name”
+     */
     private static void name() {
         getToken();
         if (ParserUtil.isReserved(token)) {
@@ -145,12 +186,20 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * declarations    const-decl       var-decl
+     */
     private static void declarations() {
         getToken();
         constDecl();
         varDecl();
     }
 
+    /**
+     * non-terminal
+     * const-decl   (  const   data-type   name   =    value   ;   )*
+     */
     private static void constDecl() {
         while (token.equals("const")) {
             dataType();
@@ -168,6 +217,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * var-decl     (  var    data-type    name-list   ;   )*
+     */
     private static void varDecl() {
         while (token.equals("var")) {
             dataType();
@@ -179,6 +232,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * data-type     int     |       float
+     */
     private static void dataType() {
         getToken();
         if (!token.equals("int") && !token.equals("float")) {
@@ -186,6 +243,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * value   “float-number”   |        “int-number”
+     */
     private static void value() {
         getToken();
         try {
@@ -195,6 +256,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * name-list     name   (  ,   name  )*
+     */
     private static void nameList() {
         name();
         getToken();
@@ -204,6 +269,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * block    {    stmt-list    }
+     */
     private static void block() {
         if (!token.equals("{")) {
             throw new RuntimeException("block error, missing {");
@@ -214,6 +283,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * stmt-list      statement   (  ;     statement   )*
+     */
     private static void stmtList() {
         getToken();
         statement();
@@ -223,6 +296,11 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * statement  ass-stmt     |     inout-stmt    |      if-stmt     |    while-stmt   |
+     * block  |   @
+     */
     private static void statement() {
         if (token.equals("input") || token.equals("output")) {
             inOutStmt();
@@ -244,6 +322,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * ass-stmt  name     =      exp
+     */
     private static void assStmt() {
         if (ParserUtil.isReserved(token)) {
             throw new RuntimeException("user defined name error, reserved keyword");
@@ -255,6 +337,10 @@ public class Main {
         exp();
     }
 
+    /**
+     * non-terminal
+     * inout-stmt input    >>    name         |    output     <<    name-value
+     */
     private static void inOutStmt() {
         if (token.equals("input")) {
             getToken();
@@ -279,6 +365,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * if-stmt  if   (   bool-exp  )  statement     else-part     endif
+     */
     private static void ifStmt() {
         getToken();
         if (!token.equals("(")) {
@@ -297,6 +387,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * while-stmt  while   (   bool-exp    )   {    stmt-list    }
+     */
     private static void whileStmt() {
         getToken();
         if (!token.equals("(")) {
@@ -317,6 +411,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * name-value   name    |      value
+     */
     private static void nameValue() {
         if (Character.isDigit(next())) {
             value();
@@ -325,12 +423,21 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * bool-exp  name-value       relational-oper        name-vaue
+     */
     private static void boolExp() {
         nameValue();
         relationalOpr();
         nameValue();
     }
 
+    /**
+     * non-terminal
+     * relational-oper   ==      |       !=         |     <     |       <=     |
+     * >     |     >=
+     */
     private static void relationalOpr() {
         getToken();
         String t = token;
@@ -343,6 +450,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * else-part   else     statement   |   @
+     */
     private static void elsePart() {
         if (token.equals("else")) {
             getToken();
@@ -350,6 +461,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * exp  term      (  add-oper   term  )*
+     */
     private static void exp() {
         term();
         while ((next() + "").equals("+") || (next() + "").equals("-")) {
@@ -358,6 +473,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * term  factor   (  mul-oper    factor   )*
+     */
     private static void term() {
         factor();
         while (!(next() + "").equals("+") && !(next() + "").equals("-") && !(next() + "").equals(";") && !(next() + "").equals(" ")) {
@@ -366,6 +485,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * factor   (     exp     )     |     name     |     value
+     */
     private static void factor() {
         if ((next() + "").equals("(")) {
             getToken();
@@ -382,6 +505,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * mul-sign  *    |    /   |   %
+     */
     private static void mulOper() {
         getToken();
         if (!token.equals("*") && !token.equals("/") && !token.equals("%")) {
@@ -389,6 +516,10 @@ public class Main {
         }
     }
 
+    /**
+     * non-terminal
+     * add-sign   +    |   -
+     */
     private static void addOper() {
         getToken();
         if (!token.equals("+") && !token.equals("-")) {
