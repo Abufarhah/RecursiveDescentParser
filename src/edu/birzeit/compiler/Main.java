@@ -110,8 +110,7 @@ public class Main {
         while (token.equals("#")) {
             getToken();
             if (!token.equals("include")) {
-                throw new RuntimeException("library declaration error, include not present at line: "
-                        + lineIndex);
+                throw new RuntimeException("library declaration error, include not present");
             }
             getToken();
             if (!token.equals("<")) {
