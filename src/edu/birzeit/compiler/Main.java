@@ -479,7 +479,7 @@ public class Main {
      */
     private static void term() {
         factor();
-        while (!(next() + "").equals("+") && !(next() + "").equals("-") && !(next() + "").equals(";") && !(next() + "").equals(" ")) {
+        while (!(next() + "").equals("+") && !(next() + "").equals("-") && !(next() + "").equals(";") && !(next() + "").equals(" ")&& !(next() + "").equals(")")) {
             mulOper();
             factor();
         }
